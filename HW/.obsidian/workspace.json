@@ -14,7 +14,7 @@
               "type": "markdown",
               "state": {
                 "file": "0303.md",
-                "mode": "source",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
@@ -28,15 +28,14 @@
               "type": "markdown",
               "state": {
                 "file": "0310.md",
-                "mode": "source",
+                "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
               "title": "0310"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -109,7 +108,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0310.md",
+                "file": "0303.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,7 +118,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for 0310"
+              "title": "Backlinks for 0303"
             }
           },
           {
@@ -128,12 +127,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0310.md",
+                "file": "0303.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from 0310"
+              "title": "Outgoing links from 0303"
             }
           },
           {
@@ -171,21 +170,21 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0310.md",
+                "file": "0303.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 0310"
+              "title": "Outline of 0303"
             }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -198,9 +197,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "42448a7acb6790a5",
+  "active": "5c35da0e94be00aa",
   "lastOpenFiles": [
-    "0303.md",
-    "0310.md"
+    "0310.md",
+    "0303.md"
   ]
 }
