@@ -54,11 +54,11 @@ digit [0-9]
 id {leter}({leter}|{digit})*
 number {digit}+(\.{digit}+)?(E[+\-]?{digit}+)?
 comment (\#[^\n]*)|(\/\*(((\*)*[^\*\/]+(\/)*)*|(\*)*|(\/)*)\*\/)|(\/\/[^\n]*)
-sentence \x22(.)*\x22
-chartype (\x27([^\x27\n]|\n)\x27)|\x27\x27
-special [\@\~\\\$\x60]
+sentence \"(.)*\"
+chartype (\'([^\n]|\n)\')|\'\'
+special [\@\~\\\$\`]
 
-PUN [(){};=+*,.-]
+PUN [(){};,.=+\-*/]
 CHAR_CONST '(\\.|[^\\'])'
 STRING \"(\\.|[^\\"])*\"
 
@@ -73,7 +73,9 @@ STRING \"(\\.|[^\\"])*\"
 "__cdecl" {out("KEYWORD",yytext);}
 "if" {out("KEYWORD",yytext);}
 "int" {out("KEYWORD",yytext);}
+
 "long" {out("KEYWORD",yytext);}
+
 "void" {out("KEYWORD",yytext);}
 "char" {out("KEYWORD",yytext);}
 "else" {out("KEYWORD",yytext);}
@@ -121,9 +123,9 @@ int main(int argc,char **argv)
                 return 0;
             }
             else
-                fprintf(stderr,"ERR: can\x22t open output %s",argv[2]);
+                fprintf(stderr,"ERR: can't open output %s",argv[2]);
         else
-            fprintf(stderr,"ERR: can\22t open input %s",argv[1]);
+            fprintf(stderr,"ERR: can't open input %s",argv[1]);
     }
     else
         fprintf(stderr,"ERR: param num must be 2 (Usage: %s in out)",argv[0]);
