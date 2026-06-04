@@ -8,7 +8,7 @@
         "type": "tabs",
         "children": [
           {
-            "id": "54280f39a101deb1",
+            "id": "ab34638f5f8e90f1",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -183,13 +183,13 @@
       "bases:Create new base": false
     }
   },
-  "active": "54280f39a101deb1",
+  "active": "ab34638f5f8e90f1",
   "lastOpenFiles": [
-    "Assets/syntax_directed_translation.jpg",
-    "Assets/syntax_directed_translation_1.jpg",
     "Assets/syntax_directed_translation_2.jpg",
-    "Pasted image 20260603175955.png",
     "0602.md",
+    "Assets/syntax_directed_translation_1.jpg",
+    "Assets/syntax_directed_translation.jpg",
+    "Pasted image 20260603175955.png",
     "0526.md",
     "0519.md",
     "0421.md",
