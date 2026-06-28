@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HMM 拼音输入法实验</title>
+
+    <style>
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            padding: 30px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 900px;
+            margin: auto;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            font-size: 22px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        input {
+            width: 100%;
+            height: 42px;
+            font-size: 20px;
+            padding: 5px 10px;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+
+        .candidate-list {
+            margin-top: 15px;
+            min-height: 50px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+        }
+
+        .candidate {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 5px;
+            background: #e8f0fe;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .candidate:hover {
+            background: #cddfff;
+        }
+
+        .stats {
+            margin-top: 20px;
+            background: #222;
+            color: #eee;
+            padding: 12px;
+            border-radius: 6px;
+            line-height: 1.8;
+        }
+
+        .hint {
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .label {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>HMM 拼音输入法实验</h1>
+
+        <div class="label">已上屏文本：</div>
+        <textarea id="output" placeholder="选择候选后文字会出现在这里"></textarea>
+
+        <div class="label">拼音输入：</div>
+        <input id="pinyin-input" placeholder="例如：wo de zhong guo 或 w d z g" autofocus>
+
+        <div class="hint">
+            输入说明：每个字的拼音或声母请用空格隔开。数字键 1-9 选择候选，Enter 选择第一个候选，Backspace 统计为回删。
+        </div>
+
+        <div class="candidate-list" id="candidates">
+            候选将在这里显示
+        </div>
+
+        <div class="stats">
+            <div>总击键次数：<span id="key-count">0</span></div>
+            <div>回删次数：<span id="delete-count">0</span></div>
+            <div>候选选择次数：<span id="select-count">0</span></div>
+            <div>当前编码长度：<span id="input-length">0</span></div>
+            <div>最近状态：<span id="status">等待输入</span></div>
+        </div>
+    </div>
+
+    <script>
+        const inputBox = document.getElementById("pinyin-input");
+        const outputBox = document.getElementById("output");
+        const candidateDiv = document.getElementById("candidates");
+
+        const keyCountSpan = document.getElementById("key-count");
+        const deleteCountSpan = document.getElementById("delete-count");
+        const selectCountSpan = document.getElementById("select-count");
+        const inputLengthSpan = document.getElementById("input-length");
+        const statusSpan = document.getElementById("status");
+
+        let keyCount = 0;
+        let deleteCount = 0;
+        let selectCount = 0;
+        let currentCandidates = [];
+
+        let timer = null;
+
+        function updateStats() {
+            keyCountSpan.innerText = keyCount;
+            deleteCountSpan.innerText = deleteCount;
+            selectCountSpan.innerText = selectCount;
+            inputLengthSpan.innerText = inputBox.value.length;
+        }
+
+        function renderCandidates(candidates) {
+            currentCandidates = candidates || [];
+
+            if (currentCandidates.length === 0) {
+                candidateDiv.innerHTML = "无候选";
+                return;
+            }
+
+            candidateDiv.innerHTML = "";
+
+            currentCandidates.forEach((item, index) => {
+                const span = document.createElement("span");
+                span.className = "candidate";
+                span.innerText = `${index + 1}. ${item.text}`;
+                span.onclick = () => chooseCandidate(index);
+                candidateDiv.appendChild(span);
+            });
+        }
+
+        function chooseCandidate(index) {
+            if (index < 0 || index >= currentCandidates.length) {
+                return;
+            }
+
+            const text = currentCandidates[index].text;
+            outputBox.value += text;
+
+            inputBox.value = "";
+            currentCandidates = [];
+            candidateDiv.innerHTML = "候选将在这里显示";
+
+            selectCount++;
+            keyCount++; // 数字选择也算一次击键
+
+            statusSpan.innerText = `已选择候选：${text}`;
+            updateStats();
+        }
+
+        async function requestDecode() {
+            const value = inputBox.value.trim();
+
+            updateStats();
+
+            if (!value) {
+                candidateDiv.innerHTML = "候选将在这里显示";
+                currentCandidates = [];
+                statusSpan.innerText = "等待输入";
+                return;
+            }
+
+            statusSpan.innerText = "正在请求后端...";
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/api/decode", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        input: value,
+                        top_k: 9
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("后端响应错误");
+                }
+
+                const data = await response.json();
+                renderCandidates(data.candidates);
+                statusSpan.innerText = "解码完成";
+
+            } catch (e) {
+                console.error(e);
+                candidateDiv.innerHTML = "请求失败，请检查 Flask 后端是否启动";
+                statusSpan.innerText = "请求失败";
+            }
+        }
+
+        function debounceDecode() {
+            clearTimeout(timer);
+            timer = setTimeout(requestDecode, 150);
+        }
+
+        inputBox.addEventListener("keydown", function (event) {
+            if (event.key === "Backspace") {
+                deleteCount++;
+                keyCount++;
+                updateStats();
+                return;
+            }
+
+            if (event.key >= "1" && event.key <= "9") {
+                event.preventDefault();
+                const index = parseInt(event.key) - 1;
+                chooseCandidate(index);
+                return;
+            }
+
+            if (event.key === "Enter") {
+                event.preventDefault();
+                chooseCandidate(0);
+                return;
+            }
+
+            if (event.key.length === 1) {
+                keyCount++;
+                updateStats();
+            }
+        });
+
+        inputBox.addEventListener("input", function () {
+            debounceDecode();
+            updateStats();
+        });
+    </script>
+
+</body>
+
+</html>
